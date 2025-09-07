@@ -12,14 +12,17 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install dependencies
-RUN npm install --only=production
+# Install all dependencies (including dev dependencies for build)
+RUN npm install
 
 # Copy source code
 COPY src/ ./src/
 
 # Build the application
 RUN npm run build
+
+# Remove dev dependencies to reduce image size
+RUN npm prune --production
 
 # Create tmp directory for file operations
 RUN mkdir -p /tmp
