@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 class MockTTSProvider implements TTSProvider {
-  async synthesizeVoice(text: string, voice?: string): Promise<Buffer> {
+  async synthesizeVoice(text: string, voice?: string): Promise<Uint8Array> {
     // Create a simple 2-second tone WAV file
     const outputPath = path.join('/tmp', 'voice.wav');
     
@@ -13,32 +13,40 @@ class MockTTSProvider implements TTSProvider {
     const frequency = 440; // A4 note
     const samples = sampleRate * duration;
     
-    const buffer = Buffer.alloc(samples * 2); // 16-bit samples
+    const buffer = new Uint8Array(samples * 2); // 16-bit samples
+    const dataView = new DataView(buffer.buffer);
     
     for (let i = 0; i < samples; i++) {
       const sample = Math.sin(2 * Math.PI * frequency * i / sampleRate);
       const intSample = Math.round(sample * 32767);
-      buffer.writeInt16LE(intSample, i * 2);
+      dataView.setInt16(i * 2, intSample, true); // little-endian
     }
     
     // Write WAV header
-    const wavHeader = Buffer.alloc(44);
-    wavHeader.write('RIFF', 0);
-    wavHeader.writeUInt32LE(36 + buffer.length, 4);
-    wavHeader.write('WAVE', 8);
-    wavHeader.write('fmt ', 12);
-    wavHeader.writeUInt32LE(16, 16); // fmt chunk size
-    wavHeader.writeUInt16LE(1, 20); // PCM format
-    wavHeader.writeUInt16LE(1, 22); // mono
-    wavHeader.writeUInt32LE(sampleRate, 24);
-    wavHeader.writeUInt32LE(sampleRate * 2, 28); // byte rate
-    wavHeader.writeUInt16LE(2, 32); // block align
-    wavHeader.writeUInt16LE(16, 34); // bits per sample
-    wavHeader.write('data', 36);
-    wavHeader.writeUInt32LE(buffer.length, 40);
+    const wavHeader = new Uint8Array(44);
+    const headerView = new DataView(wavHeader.buffer);
     
-    const wavFile = Buffer.concat([wavHeader, buffer]);
-    fs.writeFileSync(outputPath, wavFile);
+    // Write string data
+    const encoder = new TextEncoder();
+    wavHeader.set(encoder.encode('RIFF'), 0);
+    headerView.setUint32(4, 36 + buffer.length, true);
+    wavHeader.set(encoder.encode('WAVE'), 8);
+    wavHeader.set(encoder.encode('fmt '), 12);
+    headerView.setUint32(16, 16, true); // fmt chunk size
+    headerView.setUint16(20, 1, true); // PCM format
+    headerView.setUint16(22, 1, true); // mono
+    headerView.setUint32(24, sampleRate, true);
+    headerView.setUint32(28, sampleRate * 2, true); // byte rate
+    headerView.setUint16(32, 2, true); // block align
+    headerView.setUint16(34, 16, true); // bits per sample
+    wavHeader.set(encoder.encode('data'), 36);
+    headerView.setUint32(40, buffer.length, true);
+    
+    const wavFile = new Uint8Array(wavHeader.length + buffer.length);
+    wavFile.set(wavHeader, 0);
+    wavFile.set(buffer, wavHeader.length);
+    
+    fs.writeFileSync(outputPath, Buffer.from(wavFile));
     
     // Also write the script to a text file for reference
     const scriptPath = path.join('/tmp', 'script.txt');
@@ -49,14 +57,14 @@ class MockTTSProvider implements TTSProvider {
 }
 
 class ElevenLabsTTSProvider implements TTSProvider {
-  async synthesizeVoice(text: string, voice?: string): Promise<Buffer> {
+  async synthesizeVoice(text: string, voice?: string): Promise<Uint8Array> {
     // TODO: Implement ElevenLabs integration
     throw new Error('ElevenLabs TTS not implemented yet');
   }
 }
 
 class PollyTTSProvider implements TTSProvider {
-  async synthesizeVoice(text: string, voice?: string): Promise<Buffer> {
+  async synthesizeVoice(text: string, voice?: string): Promise<Uint8Array> {
     // TODO: Implement AWS Polly integration
     throw new Error('Polly TTS not implemented yet');
   }
@@ -76,7 +84,7 @@ export function getTTSProvider(): TTSProvider {
   }
 }
 
-export async function synthesizeVoice(text: string, voice?: string): Promise<Buffer> {
+export async function synthesizeVoice(text: string, voice?: string): Promise<Uint8Array> {
   const provider = getTTSProvider();
   return provider.synthesizeVoice(text, voice);
 }

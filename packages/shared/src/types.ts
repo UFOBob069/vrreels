@@ -31,7 +31,7 @@ export interface CloudTaskPayload {
 }
 
 export interface TTSProvider {
-  synthesizeVoice(text: string, voice?: string): Promise<Buffer>;
+  synthesizeVoice(text: string, voice?: string): Promise<Uint8Array>;
 }
 
 export interface VertexAIConfig {
