@@ -28,6 +28,9 @@ WORKDIR /app
 # Copy source code
 COPY apps/renderer/src/ ./src/
 
+# Create symlink to shared package in node_modules
+RUN ln -sf /app/packages/shared /app/node_modules/@vr-reels/shared
+
 # Build the application
 RUN npm run build
 
