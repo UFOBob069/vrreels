@@ -18,9 +18,9 @@ RUN npm install
 # Copy shared package
 COPY packages/shared/ ./packages/shared/
 
-# Install shared package dependencies
+# Install shared package dependencies and build it
 WORKDIR /app/packages/shared
-RUN npm install
+RUN npm install && npm run build
 
 # Go back to main app directory
 WORKDIR /app
