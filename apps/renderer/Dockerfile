@@ -9,14 +9,17 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
+COPY apps/renderer/package*.json ./
+COPY apps/renderer/tsconfig.json ./
 
 # Install all dependencies (including dev dependencies for build)
 RUN npm install
 
+# Copy shared package
+COPY packages/shared/ ./packages/shared/
+
 # Copy source code
-COPY src/ ./src/
+COPY apps/renderer/src/ ./src/
 
 # Build the application
 RUN npm run build
