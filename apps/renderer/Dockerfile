@@ -1,6 +1,7 @@
 FROM node:20-slim
 
 # Install FFmpeg and other dependencies
+# Force cache invalidation for shared package fix
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
