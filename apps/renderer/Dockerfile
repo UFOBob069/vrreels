@@ -31,7 +31,7 @@ WORKDIR /app
 RUN npm install
 
 # Copy built shared package to node_modules
-RUN mkdir -p /app/node_modules/@vr-reels && cp -r /app/packages/shared /app/node_modules/@vr-reels/shared
+RUN mkdir -p /app/node_modules/@vr-reels && rm -rf /app/node_modules/@vr-reels/shared && cp -r /app/packages/shared /app/node_modules/@vr-reels/shared
 
 # Debug: List contents to verify the copy worked
 RUN ls -la /app/node_modules/@vr-reels/shared/ && ls -la /app/node_modules/@vr-reels/shared/dist/
