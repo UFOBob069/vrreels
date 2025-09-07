@@ -2,6 +2,7 @@ FROM node:20-slim
 
 # Install FFmpeg and other dependencies
 # Force cache invalidation for shared package fix
+# Force rebuild after Buffer -> Uint8Array change
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
@@ -19,6 +20,9 @@ COPY packages/shared/ ./packages/shared/
 # Install shared package dependencies and build it
 WORKDIR /app/packages/shared
 RUN npm install && npm run build
+
+# Debug: Show the actual content of types.ts
+RUN echo "=== Checking types.ts content ===" && cat src/types.ts | grep -A 2 -B 2 "synthesizeVoice"
 
 # Go back to main app directory
 WORKDIR /app
