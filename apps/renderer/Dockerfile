@@ -12,10 +12,7 @@ WORKDIR /app
 COPY apps/renderer/package*.json ./
 COPY apps/renderer/tsconfig.json ./
 
-# Install all dependencies (including dev dependencies for build)
-RUN npm install
-
-# Copy shared package
+# Copy shared package first
 COPY packages/shared/ ./packages/shared/
 
 # Install shared package dependencies and build it
@@ -25,7 +22,10 @@ RUN npm install && npm run build
 # Go back to main app directory
 WORKDIR /app
 
-# Copy built shared package to node_modules first
+# Install all dependencies (including dev dependencies for build)
+RUN npm install
+
+# Copy built shared package to node_modules
 RUN mkdir -p /app/node_modules/@vr-reels && cp -r /app/packages/shared /app/node_modules/@vr-reels/shared
 
 # Debug: List contents to verify the copy worked
