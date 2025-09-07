@@ -18,6 +18,13 @@ RUN npm install
 # Copy shared package
 COPY packages/shared/ ./packages/shared/
 
+# Install shared package dependencies
+WORKDIR /app/packages/shared
+RUN npm install
+
+# Go back to main app directory
+WORKDIR /app
+
 # Copy source code
 COPY apps/renderer/src/ ./src/
 
