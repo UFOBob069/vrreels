@@ -7,7 +7,7 @@ export interface RenderOptions {
   jobId: string;
   photos: string[];
   script: string;
-  voiceBuffer: Buffer;
+  voiceBuffer: Uint8Array;
   veoVideoPath?: string | null;
   style: StylePreset;
   durationSec: number;
@@ -21,7 +21,7 @@ export async function renderVideo(options: RenderOptions): Promise<string> {
   const musicPath = process.env.MUSIC_BUCKET_PATH || '/tmp/music.wav';
   
   // Write voice buffer to file
-  fs.writeFileSync(voicePath, voiceBuffer);
+  fs.writeFileSync(voicePath, Buffer.from(voiceBuffer));
   
   // Create music file if it doesn't exist
   if (!fs.existsSync(musicPath)) {
