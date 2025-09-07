@@ -25,14 +25,14 @@ RUN npm install && npm run build
 # Go back to main app directory
 WORKDIR /app
 
-# Copy source code
-COPY apps/renderer/src/ ./src/
-
-# Copy built shared package to node_modules
+# Copy built shared package to node_modules first
 RUN mkdir -p /app/node_modules/@vr-reels && cp -r /app/packages/shared /app/node_modules/@vr-reels/shared
 
 # Debug: List contents to verify the copy worked
 RUN ls -la /app/node_modules/@vr-reels/shared/ && ls -la /app/node_modules/@vr-reels/shared/dist/
+
+# Copy source code
+COPY apps/renderer/src/ ./src/
 
 # Build the application
 RUN npm run build
