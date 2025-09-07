@@ -14,3 +14,7 @@ images:
 # Build options
 options:
   default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
+
+# Service account for the build
+serviceAccount: 'projects/vbroreel/serviceAccounts/firebase-adminsdk-fbsvc@vbroreel.iam.gserviceaccount.com'
