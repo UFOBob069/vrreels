@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can read/write their own jobs
+    match /jobs/{jobId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      
+      // Allow Cloud Run service to update status/progress/outputUrl/error
+      // This is a temporary rule - in production, use App Check or service account verification
+      allow update: if request.auth != null && 
+        (request.auth.uid == resource.data.userId || 
+         request.resource.data.serverWrite == true);
+    }
+  }
+}

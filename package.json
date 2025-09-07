@@ -1,0 +1,17 @@
+{
+  "name": "vr-reels-builder",
+  "version": "1.0.0",
+  "description": "Firebase + Gemini/Veo VR Reels Builder",
+  "private": true,
+  "scripts": {
+    "dev": "cd apps/web && npm run dev",
+    "build": "cd apps/web && npm run build",
+    "start": "cd apps/web && npm run start",
+    "lint": "cd apps/web && npm run lint",
+    "type-check": "cd apps/web && npm run type-check"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
